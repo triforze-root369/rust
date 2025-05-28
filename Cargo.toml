@@ -1,0 +1,9 @@
+[package]
+name = "ray_tracer"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name"]
+description = "A simple ray tracer implementation in Rust"
+
+[dependencies]
+rayon = "1.8"  # For parallel processing 
