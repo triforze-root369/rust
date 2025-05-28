@@ -1,0 +1,5 @@
+Hello, this is a test file for our encryption program!
+It contains multiple lines of text to test both encryption methods.
+We'll try both Caesar Cipher and XOR encryption on this file.
+12345 - Some numbers to test non-alphabetic characters.
+!@#$% - Some special characters to test preservation. 
