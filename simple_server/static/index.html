@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .task-form {
+            margin-bottom: 20px;
+        }
+        .task-input {
+            padding: 8px;
+            font-size: 16px;
+            width: 70%;
+            margin-right: 10px;
+        }
+        .add-button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-checkbox {
+            margin-right: 10px;
+        }
+        .delete-button {
+            margin-left: auto;
+            padding: 4px 8px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Task Manager</h1>
+        <div class="task-form">
+            <input type="text" id="taskInput" class="task-input" placeholder="Enter a new task" maxlength="100">
+            <button onclick="addTask()" class="add-button">Add Task</button>
+        </div>
+        <ul id="taskList" class="task-list">
+            <!-- Tasks will be added here dynamically -->
+        </ul>
+    </div>
+
+    <script>
+        // Fetch tasks when the page loads
+        document.addEventListener('DOMContentLoaded', fetchTasks);
+
+        async function fetchTasks() {
+            try {
+                const response = await fetch('/api/tasks');
+                const tasks = await response.json();
+                const taskList = document.getElementById('taskList');
+                taskList.innerHTML = '';
+                
+                tasks.forEach(task => {
+                    const li = createTaskElement(task);
+                    taskList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+            }
+        }
+
+        function createTaskElement(task) {
+            const li = document.createElement('li');
+            li.className = 'task-item';
+            li.innerHTML = `
+                <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''}>
+                <span>${task.title}</span>
+                <button onclick="deleteTask(${task.id})" class="delete-button">Delete</button>
+            `;
+            return li;
+        }
+
+        async function addTask() {
+            const input = document.getElementById('taskInput');
+            const title = input.value.trim();
+            
+            if (!title) return;
+            
+            try {
+                const response = await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title }),
+                });
+                
+                if (response.ok) {
+                    input.value = '';
+                    fetchTasks();
+                }
+            } catch (error) {
+                console.error('Error adding task:', error);
+            }
+        }
+
+        async function deleteTask(id) {
+            try {
+                const response = await fetch(`/api/tasks/${id}`, {
+                    method: 'DELETE',
+                });
+                
+                if (response.ok) {
+                    fetchTasks();
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+            }
+        }
+    </script>
+</body>
+</html> 
